@@ -1,8 +1,8 @@
 #!/usr/bin/env python
+# -*- coding=utf-8 -*-
 # Author: Jingyu Wang <badpasta@gmail.com>
 # 
 # Environment:
-# -*- coding=utf-8 -*-
 # Python by version 2.7.
 # request = ['pyYaml']
 
@@ -45,6 +45,31 @@ def parseParams(conf_Path):
     return trmap
 
 
+def _checkParams(func):
+    '''
+        判断参数key是否存在.
+    '''
+    def the_func(self, *args, **kwargs):
+        print self.name
+        the_key = str()
+        if len(args) and args[0] in self._options:
+                the_key = args[0]
+
+        if len(kwargs):
+            for key in kwargs.keys():
+                if key in self._options:
+                    the_key = key
+                    break
+
+        if len(the_key):
+            raise Error("Option %r already defined." 
+                        %(the_key))
+
+        return func(self, *args, **kwargs)
+
+    return the_func
+
+
 class ImitateOptions(object):
     def __init__(self):
         self._options = dict()
@@ -54,12 +79,61 @@ class ImitateOptions(object):
             return self._options[name]
         raise AttributeError("Unrecognized option %r" % name)
 
-
     def define(self, key, value):
         if key in self._options:
-            raise Error("Option %r already defined in %s" 
-                        %(key, self._options[name]))
+            raise Error("Option %r already defined." 
+                        %(key))
+        self._options[key] = value
+
+
+class AdvancedOptions(object):
+    '''
+        通过递归方式解决文件夹中配置文件的名称与数值对应问题.
+        PS: 配置文件中所有字典中的'key'都解析为实例.key.
+    '''
+    def __init__(self):
+        self._options = dict()
+
+    def __getattr__(self, name):
+        if self._options.has_key(name):
+            return self._options[name]
+        raise AttributeError("Unrecognized option %r" % name)
+    
+    @_checkParams
+    def define(self, **kw):
+        for key, value in kw.items():
+            self._options[key] = isinstance(value, dict) and \
+                                 self.recursive(**value) or value
+
+    @classmethod
+    def recursive(cls, **kw):
+        _ops = cls()
+        _ops.define(**kw)
+        return _ops
+
+
+class OtherOptions(AdvancedOptions):
+    '''
+        通过自定义options.key来确定一级参数政策.
+        EXAMPLE:
+        """ kw = {'aa': dict(bb='cc')}
+            op = OtherOptions()
+            op.addParam('aa')
+
+            for key, value in kw['aa'].items():
+                op.aa.define(key, value)
+
+                print op.aa.bb 
+        """
+    '''
+    @_checkParams
+    def addParam(self, name):
+        self._options[name] = OtherOptions()
+
+    @_checkParams
+    def define(self, key, value):
         self._options[key] = value
 
 
 Options = ImitateOptions()
+AdvOptions = AdvancedOptions()
