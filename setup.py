@@ -11,7 +11,7 @@ from setuptools import setup, find_packages
 
 setup(
     name = 'smalltools',
-    version = '0.1',
+    version = '0.3',
     description = 'Something simple tools in it.',
     author = 'Badpasta',
     author_email = 'beforget@hotmail.com',
