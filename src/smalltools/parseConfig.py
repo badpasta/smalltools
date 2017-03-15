@@ -50,7 +50,6 @@ def _checkParams(func):
         判断参数key是否存在.
     '''
     def the_func(self, *args, **kwargs):
-        print self.name
         the_key = str()
         if len(args) and args[0] in self._options:
                 the_key = args[0]
@@ -90,6 +89,12 @@ class AdvancedOptions(object):
     '''
         通过递归方式解决文件夹中配置文件的名称与数值对应问题.
         PS: 配置文件中所有字典中的'key'都解析为实例.key.
+        EXAMPLE::
+            kw = {'aa': dict(bb='cc')}
+            op = AdvancedOptions()
+            op.define(**kw)
+
+            print op.aa.bb 
     '''
     def __init__(self):
         self._options = dict()
@@ -103,10 +108,10 @@ class AdvancedOptions(object):
     def define(self, **kw):
         for key, value in kw.items():
             self._options[key] = isinstance(value, dict) and \
-                                 self.recursive(**value) or value
+                                 self._recursive(**value) or value
 
     @classmethod
-    def recursive(cls, **kw):
+    def _recursive(cls, **kw):
         _ops = cls()
         _ops.define(**kw)
         return _ops
@@ -135,5 +140,8 @@ class OtherOptions(AdvancedOptions):
         self._options[key] = value
 
 
+        
+
 Options = ImitateOptions()
 AdvOptions = AdvancedOptions()
+OtherOpts = OtherOptions()
