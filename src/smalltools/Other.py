@@ -6,9 +6,6 @@
 # Environment:
 # Python by version 2.7.
 
-def sqlZip(table_name, sql_data):
-    return  map(lambda x: dict(zip(table_name, x)), sql_data)
-
 
 # Pwoer by bufferx
 def singleton(cls, *args, **kw):
