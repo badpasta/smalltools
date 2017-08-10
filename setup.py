@@ -11,11 +11,11 @@ from setuptools import setup, find_packages
 
 setup(
     name = 'smalltools',
-    version = '0.6',
+    version = '0.6.1',
     description = 'Something simple tools in it.',
     author = 'Badpasta',
     author_email = 'beforget@hotmail.com',
-    url = 'https://github.com/badpasta/ownutils',
+    url = 'https://github.com/badpasta/smalltools',
 
     packages = find_packages('src'),
     package_dir = {'': 'src'},
